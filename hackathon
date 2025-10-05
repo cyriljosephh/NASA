@@ -1,0 +1,44 @@
+
+import streamlit as st
+import pandas as pd
+from streamlit_folium import st_folium
+import folium
+from streamlit_lottie import st_lottie
+import requests
+
+
+st.set_page_config(page_title="Healthy Cities Dashboard", layout="wide")
+
+st.title("🌍 Healthy Cities Climate Dashboard")
+
+
+city = st.text_input("Enter City:", "Thodupuzha")
+date = st.date_input("Pick a Date")
+
+st.subheader(f"📊 Data for {city} on {date}")
+
+
+st.metric(label="🌡️ Temperature", value="32 °C", delta="+2 °C")
+st.metric(label="💨 Air Quality Index", value="45", delta="-5")
+
+
+temp = st.slider("Adjust predicted temperature", min_value=0, max_value=50, value=25)
+st.write(f"Selected temperature is {temp} °C")
+
+
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+
+lottie_weather = load_lottieurl("https://assets2.lottiefiles.com/packages/lf20_j1adxtyb.json")
+if lottie_weather:
+    st_lottie(lottie_weather, height=250, key="weather")
+
+
+st.subheader("🗺️ Map View")
+m = folium.Map(location=[10.0, 76.5], zoom_start=10)
+folium.Marker([10.0, 76.5], tooltip=city).add_to(m)
+st_folium(m, width=700, height=500)
